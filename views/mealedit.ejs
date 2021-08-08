@@ -1,0 +1,40 @@
+<%-include('./partials/header'); %>
+
+
+<%var id=meal._id
+var link1='/meals'+'/edit/'+id;
+%>
+
+<form class="m-5 "  action=<%=link1%> method="POST">
+    <div class="mb-3">
+        <label for="" class="form-label">Foodname</label>
+        <input type="text" class="form-control"  name="food_name" value=<%=meal.food_name%> id="fn" aria-describedby="">
+        
+      </div>
+      <div class="mb-3">
+        <label for="" class="form-label">Calorie</label>
+        <input type="number" class="form-control" name="calorie" value=<%=meal.calorie%> id="mn">
+      </div>
+      <div class="mb-3">
+          <label for="" class="form-label">Description</label>
+          <input type="text" class="form-control" name="description" value=<%=meal.description%> id="ln">
+        </div>
+      
+        
+           <button type="submit" class="btn" style="background-color:#c09f80;">Submit</button>
+  </form>
+  <script>
+        var ancelem=document.createElement('a')
+        ancelem.setAttribute('href','/logout')    
+        ancelem.setAttribute('class','nav-link')
+        ancelem.innerHTML='Logout';
+        var lielem=document.createElement('li')  
+        lielem.setAttribute('class','nav-item')
+        lielem.appendChild(ancelem);
+        var navelem=document.getElementById('nav');
+        navelem.appendChild(lielem);
+        
+        
+</script>
+
+  <%-include('./partials/footer'); %>

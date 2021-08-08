@@ -1,0 +1,55 @@
+<%-include('./partials/header'); %>
+
+
+<%var id=user._id
+var link1='/admin/user'+'/edit/'+id;
+%>
+
+<form class="m-5 "  action=<%=link1%> method="POST">
+    <div class="mb-3">
+        <label for="" class="form-label">Username</label>
+        <input type="text" class="form-control"  name="username" value=<%=user.username%> id="fn" aria-describedby="">
+        
+      </div>
+      <div class="mb-3">
+        <label for="" class="form-label">Firstname</label>
+        <input type="text" class="form-control"  name="firstName" value=<%=user.firstName%> id="fn" aria-describedby="">
+        
+      </div>
+      <div class="mb-3">
+        <label for="" class="form-label">Lastname</label>
+        <input type="text" class="form-control"  name="lastName" value=<%=user.lastName%> id="fn" aria-describedby="">
+        
+      </div>
+    
+      <div class="mb-3">
+        <label for="" class="form-label">Calorie</label>
+        <input type="number" class="form-control" name="calories_per_day" value=<%=user.calories_per_day%> id="mn">
+      </div>
+      <div class="mb-3">
+          <label for="" class="form-label">phone</label>
+          <input type="text" class="form-control" name="phone" value=<%=user.phone%> id="ln">
+        </div>
+        <div class="mb-3">
+            <label for="" class="form-label">phone</label>
+            <input type="text" class="form-control" name="emalid" value=<%=user.emailid%> id="ln">
+          </div>
+        
+        
+           <button type="submit" class="btn" style="background-color:#c09f80;">Submit</button>
+  </form>
+  <script>
+        var ancelem=document.createElement('a')
+        ancelem.setAttribute('href','/logout')    
+        ancelem.setAttribute('class','nav-link')
+        ancelem.innerHTML='Logout';
+        var lielem=document.createElement('li')  
+        lielem.setAttribute('class','nav-item')
+        lielem.appendChild(ancelem);
+        var navelem=document.getElementById('nav');
+        navelem.appendChild(lielem);
+        
+        
+</script>
+
+  <%-include('./partials/footer'); %>

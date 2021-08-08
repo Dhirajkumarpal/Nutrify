@@ -1,0 +1,16 @@
+<%-include('./partials/header'); %>
+<script>
+    var ancelem=document.createElement('a')
+    ancelem.setAttribute('href','/logout')    
+    ancelem.setAttribute('class','nav-link')
+    ancelem.innerHTML='Logout';
+    var lielem=document.createElement('li')  
+    lielem.setAttribute('class','nav-item')
+    lielem.appendChild(ancelem);
+    var navelem=document.getElementById('nav');
+    navelem.appendChild(lielem);
+    
+    
+</script>
+<%-include('./partials/footer'); %>
+

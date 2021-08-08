@@ -1,0 +1,57 @@
+<%-include('./partials/header'); %>
+<h1></h1>
+<div class="bg-light">
+<table class="table bg-light  shadow ml-3 mr-3 mb-3" >
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Food name</th>
+        <th scope="col">Calorie</th>
+        <th scope="col">Description</th>
+        <th scope="col">User</th>
+        <th scope="col">DateTime</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      <%for(var i=0;i<=meals.length-1;i++){%>  
+      <tr class="border border-dark">
+        <td><%=(i+1)%></th>
+        <td><%=meals[i].food_name%></td>
+        <td><%=meals[i].calorie%></td>
+        <td><%=meals[i].description%></td>
+        <td><%=meals[i].username%></td>
+        <td><%=meals[i].datetime%></td>
+        <%var id=meals[i]._id
+        var link1='/meals'+'/edit/'+id;
+        var link2='/meals'+'/delete/'+id;
+        %>
+        <td><a href=<%=link1%> class="btn" style="background-color:#c09f80;">Edit</a>
+        </td>
+        <td><a href=<%=link2%>  class="btn" style="background-color:#c09f80;">Delete</a>
+        </td>
+
+      </tr>
+      <%} %>
+              </tbody>
+  </table>
+     
+  <a href="/meals/create/" class="btn m-1" style="background-color:#c09f80;">Create New Meal</a>
+</div>     
+<script>
+      var ancelem=document.createElement('a')
+      ancelem.setAttribute('href','/logout')    
+      ancelem.setAttribute('class','nav-link')
+      ancelem.innerHTML='Logout';
+      var lielem=document.createElement('li')  
+      lielem.setAttribute('class','nav-item')
+      lielem.appendChild(ancelem);
+      var navelem=document.getElementById('nav');
+      navelem.appendChild(lielem);
+      
+      
+</script>
+  <%-include('./partials/footer'); %>
+

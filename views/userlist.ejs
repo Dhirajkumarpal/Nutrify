@@ -1,0 +1,59 @@
+<%-include('./partials/header'); %>
+<h1></h1>
+<div class="bg-light">
+<table class="table bg-light  shadow ml-3 mr-3 mb-3" >
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Username</th>
+        <th scope="col">Firstname</th>
+        <th scope="col">Lastname</th>
+        <th scope="col">CalorieLimit</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Emailid</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+        
+      </tr>
+    </thead>
+    <tbody>
+      <%for(var i=0;i<=userlist.length-1;i++){%>  
+      <tr class="border border-dark">
+        <td><%=(i+1)%></th>
+        <td><%=userlist[i].username%></td>
+        <td><%=userlist[i].firstName%></td>
+        <td><%=userlist[i].lastName%></td>
+        <td><%=userlist[i].calories_per_day%></td>
+        <td><%=userlist[i].phone%></td>
+        <td><%=userlist[i].emailid%></td>
+        <%var id=userlist[i]._id
+        var link1='/admin/user'+'/edit/'+id;
+        var link2='/admin/user'+'/delete/'+id;
+        %>
+        <td><a href=<%=link1%> class="btn" style="background-color:#c09f80;">Edit</a>
+        </td>
+        <td><a href=<%=link2%>  class="btn" style="background-color:#c09f80;">Delete</a>
+        </td>
+
+      </tr>
+      <%} %>
+              </tbody>
+  </table>
+     
+  
+</div>     
+<script>
+      var ancelem=document.createElement('a')
+      ancelem.setAttribute('href','/logout')    
+      ancelem.setAttribute('class','nav-link')
+      ancelem.innerHTML='Logout';
+      var lielem=document.createElement('li')  
+      lielem.setAttribute('class','nav-item')
+      lielem.appendChild(ancelem);
+      var navelem=document.getElementById('nav');
+      navelem.appendChild(lielem);
+      
+      
+</script>
+  <%-include('./partials/footer'); %>
+
