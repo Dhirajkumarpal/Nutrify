@@ -1,2 +1,0 @@
-Query Description: Write a query to list all meals for a specific user (bhaveshs), on a given date (2020-12-20) , ordered by time.
-Query: db.meals.find({ $and: [    { username: "bhaveshs" },    { datetime: { $gte: new Date("2020-12-20").toISOString() } }       ] }).sort({ datetime: 1 })

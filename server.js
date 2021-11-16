@@ -5,6 +5,8 @@ const bodyparser=require('body-parser')
 const  cookieParser = require('cookie-parser');
 const shortid = require('shortid');
 const session= require('express-session'); //we're using 'express-session' as 'session' here
+var RedisStore = require('connect-redis')(session);  
+
 const Bcrypt = require("bcrypt"); // 
 var conn=require('./databasecon');
 const userschema=require('./Schema/userschema.js');
@@ -13,6 +15,11 @@ const mealschema=require('./Schema/mealschema.js');
 var mealRoutes=require('./Routes/mealroutes.js')
 var adminRoutes=require('./Routes/adminroutes.js')
 
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
     
 
 
@@ -23,14 +30,21 @@ app.use(express.static('public'))
 const path = require("path");
 app.set("view engine", "ejs");
 app.set('views','views');
-app.use(session({
+/*app.use(session({
 
-    secret: 'hello world',
-    resave: true,
-    saveUninitialized: true
+  store: new RedisStore({
+    url: process.env.REDIS_URL
+  }),
+  secret: process.env.REDISSECRET,
+  //resave: false,
+  //saveUninitialized: false
+
+  // secret: 'hello world',
+   resave: true,
+  saveUninitialized: true
   }))
-  
-var  authmiddleware=(req,res,next)=>{
+  */
+/*var  authmiddleware=(req,res,next)=>{
 
     console.log(req.session);
     if(req.session.user==undefined){
@@ -40,25 +54,19 @@ var  authmiddleware=(req,res,next)=>{
         next();
      }
      else{
-       res.redirect('/login')
+       res.json({msg:"please login or sign up",code:"0"})
      }
     }
     else{
-     
       if(req.url==='/login' || req.url==='/signup') {
-        res.redirect('/');
-     } 
-     else {
-       
-      next();
-      // res.redirect('/login')
-       }
-      
+        res.json({msg:"Already logged in ",code:"1"})
+     }
+     next();
     }
   
   }
 app.use(authmiddleware);
-  
+ */
 app.use('/meals',mealRoutes);  
 app.use('/admin',adminRoutes)
 app.get('/login',(req,res)=>{
@@ -67,8 +75,10 @@ app.get('/login',(req,res)=>{
   })
 
 app.post('/login', (request,response)=>{
+  
 
-
+  console.log("username",request.body.username)
+  console.log("password",request.body.password)
   console.log("inside post login")
   console.log("inside post login")
     try {
@@ -76,29 +86,36 @@ app.post('/login', (request,response)=>{
         if(!user) {
 
            console.log('user name incorrect')
-           response.redirect('/login');
+           response.json({msg:"username incorrect.please login again",code:"0"})
+           //response.redirect('/login');
+           //response.redirect('http://localhost:3000')
         }
         else{
         if(!Bcrypt.compareSync(request.body.password, user.hash_password)) {
           console.log('password incorrect')
-           response.redirect('/login');
+          response.json({msg:"password incorrect.please login again",code:"0"});
+
+           
 
       }
       else{
-      request.session.user = {
+  /*    request.session.user = {
         username: request.body.username,
   password: request.body.password,
 
   
-}// saving some user's data into user's session
-
+}*/// saving some user's data into user's session
+      
       console.log({ message: "The username and password combination is correct!" });
-      if(request.body.username==="Admin"){
+      /*if(request.body.username==="Admin"){
           response.redirect('/admin/users')
-      }
-      else{
-      response.redirect('/')
-      }
+      }*/
+      //else{
+      //response.redirect('/')
+      console.log("redirecting to home")
+      response.json({msg:"login succedssfull",code:"1"});
+
+      //}
 }
         }
 })}catch(error) {
@@ -117,7 +134,7 @@ app.get('/signup',(req,res)=>{
     
   app.post('/signup', async(request,response)=>{
 
-
+    console.log(request.body)
     console.log("inside postsign up")
       
       try {
@@ -139,20 +156,22 @@ app.get('/signup',(req,res)=>{
 
                 hash_password:Bcrypt.hashSync(request.body.password, 10)
               });
+              console.log("before save method")
               var result = await user.save();
               console.log("printing the result")
               console.log(result);
-              response.redirect('/login');
-    
+              response.json({msg:"signed up now login",code:"1"})
               console.log("the user is saved")
           }catch (error) {
+            console.log("inside catch",error)
+               
               response.status(500).send(error);
           }
           }
           else{
             
             console.log("142 the user already exist");
-            response.redirect('/login');
+            response.json({msg:"user already exist try new user",code:"3"})
           }
           
           } catch (error) {
@@ -168,7 +187,8 @@ app.get('/logout',(request,response)=>{
    });
        
 app.get('/',(req,res)=>{
-     res.render('Home')
+  console.log("got the request")
+    // res.render('Home')
     //res.send("hi the the home page")
 })
 

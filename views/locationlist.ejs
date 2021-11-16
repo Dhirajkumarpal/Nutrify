@@ -1,0 +1,72 @@
+<%-include('./partials/headerdiff'); %>
+<h1></h1>
+<div class="row"><div class="col "><a  class="btn btn-primary" href="/loc/sort/0/_id/<%= current %>">Sort by ID(INC)</a></div>
+<div class="col"><a class="btn btn-primary" href="/loc/sort/0/city/<%= current %>">Sort by City(INC)</a></div>
+<div class="col"><a class="btn btn-primary" href="/loc/sort/0/pop/<%= current %>">Sort by population(INC)</a></div>
+<div class="col"><a class="btn btn-primary" href="/loc/sort/0/state/<%= current %>">Sort by state(INC)</a></div>
+</div>
+<br>
+<div class="row"><div class="col "><a  class="btn btn-primary" href="/loc/sort/1/_id/<%= current %>">Sort by ID(DEC)</a></div>
+<div class="col"><a class="btn btn-primary" href="/loc/sort/1/city/<%= current %>">Sort by City(DEC)</a></div>
+<div class="col"><a class="btn btn-primary" href="/loc/sort/1/pop/<%= current %>">Sort by population(DEC)</a></div>
+<div class="col"><a class="btn btn-primary" href="/loc/sort/1/state/<%= current %>">Sort by state(DEC)</a></div>
+</div>
+
+<div class="bg-light">
+<table class="table bg-light  shadow ml-3 mr-3 mb-3" >
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">ID</th>
+        <th scope="col">City</th>
+        <th scope="col">Pop</th>
+        <th scope="col">State</th>
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <%for(var i=0;i<=locs.length-1;i++){%>  
+      <tr class="border border-dark">
+        <td><%=(i+1)%></th>
+        <td><%=locs[i]._id%></td>
+        <td><%=locs[i].city%></td>
+        <td><%=locs[i].pop%></td>
+        <td><%=locs[i].state%></td>
+      </tr>
+      <%} %>
+
+      <% if (pages > 0) { %>
+        <ul class="pagination text-center">
+            <% if (current == 1) { %>
+                <li class="disabled"><a>First</a></li>
+            <% } else { %>
+                <li><a href="/loc/1">First</a></li>
+            <% } %>
+            <% var i = (Number(current) > 5 ? Number(current) - 4 : 1) %>
+            <% if (i !== 1) { %>
+                <li class="disabled"><a>...</a></li>
+            <% } %>
+            <% for (; i <= (Number(current) + 4) && i <= pages; i++) { %>
+                <% if (i == current) { %>
+                    <li class="active"><a><%= i %></a></li>
+                <% } else { %>
+                    <li><a href="/loc/<%= i %>"><%= i %></a></li>
+                <% } %>
+                <% if (i == Number(current) + 4 && i < pages) { %>
+                    <li class="disabled"><a>...</a></li>
+                <% } %>
+            <% } %>
+            <% if (current == pages) { %>
+                <li class="disabled"><a>Last</a></li>
+            <% } else { %>
+                <li><a href="/loc/<%= pages %>">Last</a></li>
+            <% } %>
+        </ul>
+    <% } %>
+              </tbody>
+  </table>
+     
+  
+  <%-include('./partials/footer'); %>
+

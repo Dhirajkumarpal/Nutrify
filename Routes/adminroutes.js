@@ -15,7 +15,8 @@ router.get('/users',(req,res)=>{
         console.log("getting the meals");
         console.log(result)
        /*console.log(resp);*/
-        res.render('userlist',{userlist:result});
+       // res.render('userlist',{userlist:result});
+       res.json({users:result});
     });
     
     
@@ -26,12 +27,12 @@ router.get('/users',(req,res)=>{
 router.get('/get_meals_of_a_user/:username',(req,res)=>{
     console.log("inside edit get of admin user")
     var uname=req.params.username;
-    uname=uname.substring(1);
+    
     console.log(uname);
     mealschema.find({username:uname},(err,result)=>{
     
         console.log(result);
-        res.send(result)
+        res.json({meals:result});
     });
     
     console.log("exiting edit  of user")
@@ -43,7 +44,8 @@ router.get('/user/edit/:id',(req,res)=>{
     userschema.findOne({_id:id},(err,result)=>{
     
         console.log(result);
-        res.render('useredit',{user:result});
+        //res.render('useredit',{user:result});
+        res.json({user:result});
     });
     
     console.log("exiting edit  of user")
@@ -57,7 +59,8 @@ console.log("inside post method of edit");
 userschema.findByIdAndUpdate({_id:id},req.body,(err,result)=>{
     
         console.log("printing updated"+result);
-        res.redirect('/admin/users/');
+       // res.redirect('/admin/users/');
+       res.json({msg:"user updated successfully" ,code:"1"})
         
     });
     
@@ -72,7 +75,9 @@ router.get('/user/delete/:id',(req,res)=>{
     userschema.deleteOne({_id:id},(err,result)=>{
         console.log("printing deleted student");
         console.log(result);
-        res.redirect('/admin/users/');   
+        //res.redirect('/admin/users/'); 
+        res.json({msg:"user deleted successfully" ,code:"1"})
+             
     
         })
 

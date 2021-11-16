@@ -12,7 +12,7 @@ router.get('/',(req,res)=>{
         console.log("getting the meals");
         console.log(resp)
        /*console.log(resp);*/
-        res.render('mealList',{meals:resp});
+        res.json({meals:resp});
     });
     
     
@@ -41,7 +41,8 @@ router.post('/',(req,res)=>{
             "food_name": req.body.food_name,
             "calorie": req.body.calorie,
             "description": req.body.description,
-            "username": req.session.user.username,
+            "username":"dhiraj",
+          //  "username": req.session.user.username,
             "datetime": req.body.datetime,
             
         
@@ -53,7 +54,7 @@ router.post('/',(req,res)=>{
         else{
             console.log('saving  successfull')
             console.log(result)
-            
+            res.json({msg:"new meal saved successfully",code:'1'})
 
         }
     })
@@ -63,7 +64,7 @@ router.post('/',(req,res)=>{
     
     //console.log(obj[0].class)
     //obj[0].Nostudent=obj[0].Nostudent+1
-    res.redirect('/meals/');
+   // res.redirect('/meals/');
     
     
 
@@ -73,10 +74,10 @@ router.post('/',(req,res)=>{
 router.get('/edit/:id',async (req,res)=>{
     console.log("inside edit get of meals")
     var id=req.params.id;
-    console.log(req.session)
-    console.log(typeof req.session)
-    console.log(req.session.user["username"])
-    var username=req.session.user["username"]
+    //console.log(req.session)
+   // console.log(typeof req.session)
+    //console.log(req.session.user["username"])
+    //var username=req.session.user["username"]
 
  
    
@@ -101,7 +102,7 @@ router.get('/edit/:id',async (req,res)=>{
             res.redirect('/meals/');
         }*/
         console.log("before rendering");
-        res.render('mealedit',{meal:resp});
+        res.json({meal:resp})
         console.log("after render1");
 
     });
@@ -145,16 +146,19 @@ var newmeal=new mealschema({
     "food_name": req.body.food_name,
     "calorie": req.body.calorie,
     "description": req.body.description,
-    "username": req.session.user.username,
+    "username":"dhiraj",
+   // "username": req.session.user.username,
     "datetime": req.body.datetime,
     
 
 })
+console.log(newmeal)
 
     var students1=mealschema.findByIdAndUpdate({_id:id},newmeal,(reqp,resp)=>{
         
         console.log("printing resp"+resp);
-        res.redirect('/meals/');
+        res.json({msg:"the edited meal is saved in datbase",code:'1'})
+        //res.redirect('/meals/');
         
     });
     
@@ -170,20 +174,20 @@ router.get('/delete/:id',(req,res)=>{
     mealschema.findById({_id:id},(err,resp)=>{
     console.log("foudn elemnt with id")
     console.log(resp)
-        if(resp.username==req.session.user.username){
+       // if(resp.username==req.session.user.username){
          console.log("the usernme are equals")
         mealschema.deleteOne({_id:id},(req1,res1)=>{
             console.log("printing deleted student");
             console.log(res1);
             
 
-            res.redirect('/meals/');
+            res.json({msg:"meals is deleted successfully",code:'1'})
         })
-     }
-        else{
-            console.log("cannot delete as it belongsd to different user ")
-            res.redirect('/meals/');
-        }
+    // }
+       // else{
+         //   console.log("cannot delete as it belongsd to different user ")
+           // res.json({msg:"cannot be deleted as it belong to different user"})
+        //}
     }
       );
  })
@@ -228,14 +232,15 @@ router.get('/delete/:id',(req,res)=>{
   }());
   
 
- router.get('/usermeal',(req,res)=>{
+ router.get('/caloriecheck',(req,res)=>{
     console.log("inside get methods of  meals of a user")
     var currdate=new Date();
     console.log("printing current date",currdate);
     console.log(req.session)
     var dt="2021-07-30T00:00:00.000Z";
+    //var usern=req.session.user.username
    // console.log(session)
-    mealschema.find({username:req.session.user.username,datetime:{$lt:dt}},(err,result)=>{
+    mealschema.find({username:"Laxman",datetime:{$gt:dt}},(err,result)=>{
         console.log("getting the meals of user");
         console.log(result)
         var t_calorie=0
@@ -243,12 +248,13 @@ router.get('/delete/:id',(req,res)=>{
               t_calorie=t_calorie+e.calorie;
         });
 
-        userschema.findOne({username:req.session.user.username},(err,result1)=>{
+        userschema.findOne({username:"Laxman"},(err,result1)=>{
             if(t_calorie>result1.calories_per_day){
-                console.log("limit excedded")
+                res.json({status:"limit excedded",calorie_consumed:t_calorie,calorie_remaining:result1.calories_per_day})
             }
             else{
-                console.log("limit not excedded")
+                res.json({status:"limit not excedded",calorie_consumed:t_calorie,calorie_remaining:result1.calories_per_day})
+           
             }
         })
         
@@ -261,11 +267,70 @@ router.get('/delete/:id',(req,res)=>{
             }
         });
         */
-        result.sort((a, b) => {
-            return a.calorie - b.calorie;
-        });
+        
+
+       /*console.log(resp);*/
+        
+    });
+    
     
 
+})
+
+
+router.get('/sortmeal/:field/:inc_or_dec',(req,res)=>{
+    var field=req.params.field;
+    var ind=req.params.inc_or_dec;
+    
+    console.log("inside get methods of  meals of a user")
+    var currdate=new Date();
+    console.log("printing current date",currdate);
+    console.log(req.session)
+    var dt="2021-07-30T00:00:00.000Z";
+   // console.log(session)
+    mealschema.find({username:"Laxman",datetime:{$gt:dt}},(err,result)=>{
+        console.log("getting the meals of user");
+        console.log(result)
+        
+        
+        
+        /*sortBy(result, {
+            prop: "datetime",
+            desc:true,
+            parser: function (item) {
+                return new Date(item);
+            }
+        });
+        */
+        if(field=="calorie"){
+            if(ind=="inc"){
+                result.sort((a, b) => {
+                    return a.calorie - b.calorie;
+                });
+            }
+            else{
+                result.sort((a, b) => {
+                    return b.calorie - a.calorie;
+                });
+            }
+
+
+            
+            
+        }
+        else{
+            if(ind=="inc"){
+                result.sort((a, b) => {
+                    return a.datetime - b.datetime;
+                });
+            }
+            else{
+                result.sort((a, b) => {
+                    return b.datetime - a.datetime;
+                });
+            }
+           
+        }
         console.log("after sorting by date",result)
         
 
