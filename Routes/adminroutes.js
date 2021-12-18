@@ -3,11 +3,11 @@ var router=express.Router();
 var conn=require('../databasecon');
 var mealschema=require('../Schema/mealschema.js')
 var userschema=require('../Schema/userschema.js')
+var auth=require('../auth.js')
 
 
 
-
-router.get('/users',(req,res)=>{
+router.get('/users',auth,(req,res)=>{
     console.log("inside get users ")
     console.log(req.session)
    // console.log(session)
@@ -24,7 +24,7 @@ router.get('/users',(req,res)=>{
 })
 
 
-router.get('/get_meals_of_a_user/:username',(req,res)=>{
+router.get('/get_meals_of_a_user/:username',auth,(req,res)=>{
     console.log("inside edit get of admin user")
     var uname=req.params.username;
     
@@ -38,7 +38,7 @@ router.get('/get_meals_of_a_user/:username',(req,res)=>{
     console.log("exiting edit  of user")
 })
 
-router.get('/user/edit/:id',(req,res)=>{
+router.get('/user/edit/:id',auth,(req,res)=>{
     console.log("inside edit get of admin user")
     var id=req.params.id;
     userschema.findOne({_id:id},(err,result)=>{
@@ -51,7 +51,7 @@ router.get('/user/edit/:id',(req,res)=>{
     console.log("exiting edit  of user")
 })
 
-router.post('/user/edit/:id',(req,res)=>{
+router.post('/user/edit/:id',auth,(req,res)=>{
     var id=req.params.id;
 
 console.log("inside post method of edit");
@@ -69,7 +69,7 @@ userschema.findByIdAndUpdate({_id:id},req.body,(err,result)=>{
 
 
 
-router.get('/user/delete/:id',(req,res)=>{
+router.get('/user/delete/:id',auth,(req,res)=>{
     var id=req.params.id;
     console.log("inside get delete method of user")
     userschema.deleteOne({_id:id},(err,result)=>{

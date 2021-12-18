@@ -3,10 +3,11 @@ var router=express.Router();
 var conn=require('../databasecon');
 var mealschema=require('../Schema/mealschema.js')
 var userschema=require('../Schema/userschema.js')
-
-router.get('/',(req,res)=>{
+var auth=require('../auth.js')
+router.get('/',auth,(req,res)=>{
+    
     console.log("inside get meals ")
-    console.log(req.session)
+//    console.log(req.session)
    // console.log(session)
     mealschema.find({},(req1,resp)=>{
         console.log("getting the meals");
@@ -21,7 +22,7 @@ router.get('/',(req,res)=>{
 
 
 
-router.get('/create',(req,res)=>{
+router.get('/create',auth,(req,res)=>{
     console.log("inside get create")    
         res.render('Createmeal',{});
     });
@@ -31,7 +32,7 @@ router.get('/create',(req,res)=>{
 
 
 
-router.post('/',(req,res)=>{
+router.post('/',auth,(req,res)=>{
     console.log("inside  post of meals")
     console.log("inside post method")
     
@@ -41,7 +42,7 @@ router.post('/',(req,res)=>{
             "food_name": req.body.food_name,
             "calorie": req.body.calorie,
             "description": req.body.description,
-            "username":"dhiraj",
+            "username":req.header('username'),
           //  "username": req.session.user.username,
             "datetime": req.body.datetime,
             
@@ -71,7 +72,7 @@ router.post('/',(req,res)=>{
 
 })
 
-router.get('/edit/:id',async (req,res)=>{
+router.get('/edit/:id',auth,async (req,res)=>{
     console.log("inside edit get of meals")
     var id=req.params.id;
     //console.log(req.session)
@@ -118,7 +119,7 @@ catch(error){
 });
 
 
-router.post('/edit/:id',(req,res)=>{
+router.post('/edit/:id',auth,(req,res)=>{
     console.log("inside edit post m of meals")
     var id=req.params.id;
     console.log(id);
@@ -146,7 +147,7 @@ var newmeal=new mealschema({
     "food_name": req.body.food_name,
     "calorie": req.body.calorie,
     "description": req.body.description,
-    "username":"dhiraj",
+    "username":req.body.username,
    // "username": req.session.user.username,
     "datetime": req.body.datetime,
     
@@ -167,7 +168,7 @@ console.log(newmeal)
 
 
 
-router.get('/delete/:id',(req,res)=>{
+router.get('/delete/:id',auth,(req,res)=>{
     console.log("inside delete post of meals")
     var id=req.params.id;
     console.log("printing id:"+id)
@@ -232,7 +233,7 @@ router.get('/delete/:id',(req,res)=>{
   }());
   
 
- router.get('/caloriecheck',(req,res)=>{
+ router.get('/caloriecheck',auth,(req,res)=>{
     console.log("inside get methods of  meals of a user")
     var currdate=new Date();
     console.log("printing current date",currdate);
@@ -278,7 +279,7 @@ router.get('/delete/:id',(req,res)=>{
 })
 
 
-router.get('/sortmeal/:field/:inc_or_dec',(req,res)=>{
+router.get('/sortmeal/:field/:inc_or_dec',auth,(req,res)=>{
     var field=req.params.field;
     var ind=req.params.inc_or_dec;
     

@@ -6,14 +6,28 @@ const  cookieParser = require('cookie-parser');
 const shortid = require('shortid');
 const session= require('express-session'); //we're using 'express-session' as 'session' here
 var RedisStore = require('connect-redis')(session);  
+const jwt1 = require('express-jwt');
+var cors = require('cors')
 
+
+app.use(cors())
 const Bcrypt = require("bcrypt"); // 
 var conn=require('./databasecon');
 const userschema=require('./Schema/userschema.js');
 const mealschema=require('./Schema/mealschema.js');
-
+const auth=require('./auth.js');
 var mealRoutes=require('./Routes/mealroutes.js')
 var adminRoutes=require('./Routes/adminroutes.js')
+const jwt = require("jsonwebtoken");
+app.use(cookieParser())
+app.use(bodyparser.urlencoded({ extended : true}))
+app.use(express.json())
+app.use(express.static('public'))
+const path = require("path");
+const { appendFile } = require('fs/promises');
+app.set("view engine", "ejs");
+app.set('views','views');
+
 
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -24,12 +38,6 @@ app.use(function(req, res, next) {
 
 
 //all app.uses
-app.use(bodyparser.urlencoded({ extended : true}))
-app.use(express.json())
-app.use(express.static('public'))
-const path = require("path");
-app.set("view engine", "ejs");
-app.set('views','views');
 /*app.use(session({
 
   store: new RedisStore({
@@ -44,10 +52,84 @@ app.set('views','views');
   saveUninitialized: true
   }))
   */
-/*var  authmiddleware=(req,res,next)=>{
+  /*app.use(
+    jwt1({
+      secret: 'login,signup',
+      algorithms: ['HS256'] ,
+      getToken: req => req.cookies.access_token
+    })
+  );*/
+  /*const getSignedJwtToken = id => {
+    return jwt.sign({id},"login,signup", {
+    expiresIn: '30d'
+    })
+    }*/
+    //console.log(getSignedJwtToken("615f1b7c5627d62a385ccad3"))
 
-    console.log(req.session);
-    if(req.session.user==undefined){
+
+var  authmiddleware=(req,res,next)=>{
+
+    //console.log(req.session);
+    
+    //console.log(req.cookie.username)
+  //  token=req.cookies.token
+  console.log("printing cookies")
+  
+  
+    //console.log(token)
+    const token = req.header("x-auth-token");
+    console.log(token);
+    
+    console.log("i middleware")
+    
+    if (!token) {
+      console.log("token is not set")
+      if(req.url==='/login' || req.url==='/signup') {
+        console.log("url is login,signup hence executing next()")
+        return next();
+     }
+      // alert("user not logined");
+     // console.log("need to exec alert")
+       return res.json({msg:"user not logiined",code:"2"})
+
+    }
+    try {
+      if(req.url==='/login' || req.url==='/signup') {
+        res.json({msg:"user is already logined",code:"1"})
+;
+     }
+     
+     console.log("token exist")
+     console.log("token:"+token)
+     console.log("ma")
+     jwt.verify(token, "login,signup",function(err,decoded){
+        if(err){
+          console.log("error "+err);
+          
+        }
+        else{
+          console.log("mb")
+          console.log("decode")
+          console.log(decoded._id);
+          console.log(decoded.username);
+
+          console.log("mc")
+      //req.username = decoded.username;
+      
+        }
+      });
+      
+       
+      console.log(req.userId);
+      console.log(req.username)
+      console.log.log("before next")    
+      next();
+    } catch {
+      res.json({msg:"error occured while logging",code:"2"})
+;
+    }
+  
+    /*if(req.session.user==undefined){
       console.log("sessionnot set redirecting to login")
       
       if(req.url==='/login' || req.url==='/signup') {
@@ -62,11 +144,11 @@ app.set('views','views');
         res.json({msg:"Already logged in ",code:"1"})
      }
      next();
-    }
+    }*/
   
   }
-app.use(authmiddleware);
- */
+//app.use(authmiddleware);
+console.log("before meals")
 app.use('/meals',mealRoutes);  
 app.use('/admin',adminRoutes)
 app.get('/login',(req,res)=>{
@@ -74,7 +156,7 @@ app.get('/login',(req,res)=>{
     res.render('login',{});
   })
 
-app.post('/login', (request,response)=>{
+app.post('/login',async (request,res)=>{
   
 
   console.log("username",request.body.username)
@@ -82,10 +164,11 @@ app.post('/login', (request,response)=>{
   console.log("inside post login")
   console.log("inside post login")
     try {
-        userschema.findOne({ username: request.body.username },(err,user)=>{
+        userschema.findOne({ username: request.body.username },async(err,user)=>{
         if(!user) {
-
+        
            console.log('user name incorrect')
+           
            response.json({msg:"username incorrect.please login again",code:"0"})
            //response.redirect('/login');
            //response.redirect('http://localhost:3000')
@@ -105,6 +188,7 @@ app.post('/login', (request,response)=>{
 
   
 }*/// saving some user's data into user's session
+
       
       console.log({ message: "The username and password combination is correct!" });
       /*if(request.body.username==="Admin"){
@@ -112,8 +196,41 @@ app.post('/login', (request,response)=>{
       }*/
       //else{
       //response.redirect('/')
-      console.log("redirecting to home")
-      response.json({msg:"login succedssfull",code:"1"});
+      //var token=getSignedJwtToken(user._id);
+      //jwt.sign({id:user._id},"login,signup", {
+        //expiresIn: '30d'
+        //})
+        console.log("a")
+        var token =await jwt.sign({
+          id: user._id,
+          username: user.username
+        }, "login,signup", { expiresIn: '1h' });
+        console.log("b")
+        //res.cookie('token', token)
+        res.json({msg:"succesfully login",token:token,username:user.username})
+        console.log("c")
+      /*const token = jwt.sign({exp: Math.floor(Date.now() / 1000) + (60 * 60), id: user._id, username: user.username }, "login,signup"
+        );
+      console.log(token);
+     res.cookie('access_token', token, {
+        maxAge: 60*60*24*30*1000, //30 days
+            secure: false,
+        httpOnly: false
+      })*/
+      
+      //res.json({ message: "Logged in successfully 😊 👌" ,code:"1",token:token});
+       console.log("D")
+     /*res.cookie("access_token", token, {
+        httpOnly: true,
+        secure: true
+      })
+      .status(200)
+      console.log(res)
+
+      res.json({ message: "Logged in successfully 😊 👌" ,code:"1"});
+      */
+     // console.log("redirecting to home")
+      //response.json({msg:"login succedssfull",code:"1"});
 
       //}
 }
@@ -180,10 +297,57 @@ app.get('/signup',(req,res)=>{
     
     })
    
-app.get('/logout',(request,response)=>{
-        request.session.user=undefined;
-        console.log("logging out");
-        response.redirect('/login');
+
+
+ 
+    
+    app.get("/tokenIsValid", async (req, res) => {
+    
+try{
+const token = req.header("x-auth-token");
+console.log(token)
+console.log("A")
+if(!token){
+    console.log("B")
+
+return res.status(401).json({msg: "No authentication token, access denied",authentication:false});
+}
+console.log("C")
+
+const verified = jwt.verify(token, "login,signup");
+console.log("D")
+
+console.log("verified : ",verified)
+if(!verified){
+    console.log("not verified")
+return res.status(401).json({msg: "Token verification failed, authorization denied",authentication:false});
+}
+console.log("after verification")
+//req.userid = verified.id;
+//req.username=verified.username;
+
+next();
+} catch (err) {
+    console.log("E")
+
+res.json({ error: err.message,authentication:false });
+} });
+  app.get("/currentuserinfo",async (req, res) => {
+      const user = await userschema.findById(req.user);
+      res.json({
+      username: user.username,
+      
+      });
+      });
+
+
+app.get('/logout',(request,res)=>{
+  localStorage.setItem("x-auth-token",undefined);
+  localStorage.setItem("username",undefined);
+  
+  return res
+  
+  .json({ message: "Successfully logged out 😏 🍀" ,code:"2"});
    });
        
 app.get('/',(req,res)=>{
